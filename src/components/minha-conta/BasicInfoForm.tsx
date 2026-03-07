@@ -1,14 +1,11 @@
 
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { User, CreditCard, Building, Calendar, Phone } from 'lucide-react';
 import { formatCpf, formatCnpj, formatPhone, formatDateOfBirth } from '@/utils/formatters';
-import { useLiquidGlass } from '@/contexts/LiquidGlassContext';
-import { useTheme } from '@/components/ThemeProvider';
-import { cn } from '@/lib/utils';
 
 interface UserData {
   full_name: string;
@@ -84,10 +81,7 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ userData, onInputChange }
   };
 
   return (
-    <Card 
-      className={cn(liquidGlassConfig.enabled && "bg-transparent border-transparent")}
-      style={liquidGlassConfig.enabled ? glassStyle : undefined}
-    >
+    <Card>
       <CardHeader className="p-4 sm:p-6">
         <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
           <User className="h-4 w-4 sm:h-5 sm:w-5 text-brand-purple" />
