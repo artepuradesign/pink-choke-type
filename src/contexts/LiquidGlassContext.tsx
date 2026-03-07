@@ -80,8 +80,16 @@ export const LiquidGlassProvider: React.FC<{ children: React.ReactNode }> = ({ c
   );
 };
 
-export const useLiquidGlass = () => {
+export const useLiquidGlass = (): LiquidGlassContextType => {
   const ctx = useContext(LiquidGlassContext);
-  if (!ctx) throw new Error('useLiquidGlass must be used within LiquidGlassProvider');
+  if (!ctx) {
+    // Return safe defaults when used outside provider
+    return {
+      config: defaultLiquidGlassConfig,
+      setConfig: () => {},
+      updateParam: () => {},
+      resetToDefaults: () => {},
+    };
+  }
   return ctx;
 };
