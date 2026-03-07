@@ -45,7 +45,7 @@ const ModulosContent = () => {
 
   return (
     <ModuleTemplateProvider>
-      <div className="space-y-6">
+      <div className="space-y-6 w-full">
         <PanelsGrid activePanels={consultaPanels} />
       </div>
     </ModuleTemplateProvider>
@@ -68,9 +68,9 @@ const Modulos = () => {
   return (
     <PageLayout variant="auth" backgroundOpacity="strong" showGradients={false} className="flex flex-col">
       <MenuSuperior />
-      <main className="w-full overflow-x-hidden">
+      <main className="w-full overflow-x-hidden flex-1">
         <section className="py-8 sm:py-12">
-          <div className="container mx-auto px-4 sm:px-6 max-w-6xl">
+          <div className="w-full px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
