@@ -7,6 +7,8 @@ import * as Icons from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { useApiModules } from "@/hooks/useApiModules";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useLiquidGlass } from "@/contexts/LiquidGlassContext";
+import { cn } from "@/lib/utils";
 
 interface SimpleTitleBarProps {
   title: string;
