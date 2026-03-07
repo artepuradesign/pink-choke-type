@@ -6,9 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import { Settings, Save, Loader2, Globe, MessageCircle, Shield, DollarSign, Users, RefreshCw, ArrowLeft, Instagram, Send, Music, Phone } from 'lucide-react';
+import { Settings, Save, Loader2, Globe, MessageCircle, Shield, DollarSign, Users, RefreshCw, Instagram, Send, Music, Phone } from 'lucide-react';
 import { systemConfigAdminService, SystemConfigItem } from '@/services/systemConfigAdminService';
-import { useNavigate } from 'react-router-dom';
+import DashboardTitleCard from '@/components/dashboard/DashboardTitleCard';
 
 const CATEGORY_LABELS: Record<string, { label: string; icon: React.ReactNode }> = {
   general: { label: 'Geral', icon: <Globe className="h-4 w-4" /> },
