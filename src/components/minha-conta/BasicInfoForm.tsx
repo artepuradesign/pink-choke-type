@@ -1,14 +1,11 @@
 
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { User, CreditCard, Building, Calendar, Phone } from 'lucide-react';
 import { formatCpf, formatCnpj, formatPhone, formatDateOfBirth } from '@/utils/formatters';
-import { useLiquidGlass } from '@/contexts/LiquidGlassContext';
-import { useTheme } from '@/components/ThemeProvider';
-import { cn } from '@/lib/utils';
 
 interface UserData {
   full_name: string;
@@ -26,27 +23,6 @@ interface BasicInfoFormProps {
 }
 
 const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ userData, onInputChange }) => {
-  const { config: liquidGlassConfig } = useLiquidGlass();
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
-
-  const glassStyle = useMemo<React.CSSProperties>(() => {
-    if (!liquidGlassConfig.enabled) return {};
-    const filter = `blur(${liquidGlassConfig.strength + liquidGlassConfig.extraBlur}px) saturate(${liquidGlassConfig.tintSaturation}%) contrast(${liquidGlassConfig.contrast}%) brightness(${liquidGlassConfig.brightness}%) invert(${liquidGlassConfig.invert}%) hue-rotate(${liquidGlassConfig.tintHue}deg)`;
-    const bgAlpha = liquidGlassConfig.backgroundAlpha / 100;
-    const specHighAlpha = liquidGlassConfig.edgeSpecularity / 200;
-    const specLowAlpha = liquidGlassConfig.edgeSpecularity / 300;
-    const borderAlpha = liquidGlassConfig.backgroundAlpha / 200;
-    return {
-      borderRadius: `${liquidGlassConfig.cornerRadius}px`,
-      backdropFilter: filter,
-      WebkitBackdropFilter: filter,
-      background: `rgba(255,255,255,${bgAlpha})`,
-      boxShadow: `0 0 ${liquidGlassConfig.softness}px rgba(255,255,255,${specHighAlpha}), inset 0 1px 0 rgba(255,255,255,${specLowAlpha})`,
-      opacity: liquidGlassConfig.opacity / 100,
-      border: `1px solid rgba(255,255,255,${borderAlpha})`,
-    };
-  }, [liquidGlassConfig, isDark]);
   const handleCpfChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatCpf(e.target.value);
     onInputChange('cpf', formatted);
@@ -65,18 +41,14 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ userData, onInputChange }
   const handleDateOfBirthChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value;
     
-    // Se o valor contém mais de 8 dígitos e não tem barras, provavelmente é uma data colada
     if (value.length > 8 && !value.includes('/')) {
-      // Detectar formato AAAA-MM-DD (ISO format)
       if (value.includes('-') && value.length === 10) {
         const [year, month, day] = value.split('-');
         value = `${day}/${month}/${year}`;
       } else if (value.length === 8) {
-        // DDMMAAAA format
         value = value.replace(/(\d{2})(\d{2})(\d{4})/, '$1/$2/$3');
       }
     } else {
-      // Formatação normal com autocompletar barras
       value = formatDateOfBirth(value);
     }
     
@@ -84,10 +56,7 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ userData, onInputChange }
   };
 
   return (
-    <Card 
-      className={cn(liquidGlassConfig.enabled && "bg-transparent border-transparent")}
-      style={liquidGlassConfig.enabled ? glassStyle : undefined}
-    >
+    <Card>
       <CardHeader className="p-4 sm:p-6">
         <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
           <User className="h-4 w-4 sm:h-5 sm:w-5 text-brand-purple" />
@@ -114,10 +83,10 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ userData, onInputChange }
               type="email"
               value={userData.email || ''}
               readOnly
-              className="bg-gray-100 cursor-not-allowed text-sm sm:text-base"
+              className="bg-muted cursor-not-allowed text-sm sm:text-base"
               placeholder="Digite seu e-mail"
             />
-            <p className="text-xs text-gray-500">E-mail não pode ser alterado</p>
+            <p className="text-xs text-muted-foreground">E-mail não pode ser alterado</p>
           </div>
 
           <div className="space-y-1.5 sm:space-y-2">
@@ -140,7 +109,7 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ userData, onInputChange }
             <div className="space-y-1.5 sm:space-y-2">
               <Label htmlFor="cpf" className="text-sm">CPF</Label>
               <div className="relative">
-                <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="cpf"
                   value={userData.cpf || ''}
@@ -155,7 +124,7 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ userData, onInputChange }
             <div className="space-y-1.5 sm:space-y-2">
               <Label htmlFor="cnpj" className="text-sm">CNPJ</Label>
               <div className="relative">
-                <Building className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Building className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="cnpj"
                   value={userData.cnpj || ''}
@@ -171,7 +140,7 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ userData, onInputChange }
           <div className="space-y-1.5 sm:space-y-2">
             <Label htmlFor="data_nascimento" className="text-sm">Data de Nascimento</Label>
             <div className="relative">
-              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 id="data_nascimento"
                 type="text"
@@ -182,13 +151,13 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ userData, onInputChange }
                 maxLength={10}
               />
             </div>
-            <p className="text-xs text-gray-500">Digite ou cole a data (DD/MM/AAAA)</p>
+            <p className="text-xs text-muted-foreground">Digite ou cole a data (DD/MM/AAAA)</p>
           </div>
 
           <div className="space-y-1.5 sm:space-y-2">
             <Label htmlFor="telefone" className="text-sm">Telefone</Label>
             <div className="relative">
-              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 id="telefone"
                 value={userData.telefone || ''}
