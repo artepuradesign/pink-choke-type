@@ -92,12 +92,8 @@ const StatsCard: React.FC<StatsCardProps> = ({
   };
 
   return (
-    <Card 
-      className={cn(
-        liquidGlassConfig.enabled ? 'bg-transparent border-transparent' : 'bg-white/75 dark:bg-gray-800/75 border-gray-200/75 dark:border-gray-700/75 backdrop-blur-sm'
-      )}
-      style={liquidGlassConfig.enabled ? glassStyle : undefined}
-    >
+    <Card>
+
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <TrendingUp className="h-5 w-5" />
