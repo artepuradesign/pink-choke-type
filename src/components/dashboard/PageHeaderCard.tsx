@@ -1,7 +1,10 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Crown } from 'lucide-react';
+import { useLiquidGlass } from '@/contexts/LiquidGlassContext';
+import { useTheme } from '@/components/ThemeProvider';
+import { cn } from '@/lib/utils';
 
 export interface PageHeaderCardProps {
   title: string;
@@ -28,8 +31,36 @@ const PageHeaderCard: React.FC<PageHeaderCardProps> = ({
   showAddButton,
   isCompact
 }) => {
+  const { config: liquidGlassConfig } = useLiquidGlass();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
+  const glassStyle = useMemo<React.CSSProperties>(() => {
+    if (!liquidGlassConfig.enabled) return {};
+    const filter = `blur(${liquidGlassConfig.strength + liquidGlassConfig.extraBlur}px) saturate(${liquidGlassConfig.tintSaturation}%) contrast(${liquidGlassConfig.contrast}%) brightness(${liquidGlassConfig.brightness}%) invert(${liquidGlassConfig.invert}%) hue-rotate(${liquidGlassConfig.tintHue}deg)`;
+    const bgAlpha = liquidGlassConfig.backgroundAlpha / 100;
+    const specHighAlpha = liquidGlassConfig.edgeSpecularity / 200;
+    const specLowAlpha = liquidGlassConfig.edgeSpecularity / 300;
+    const borderAlpha = liquidGlassConfig.backgroundAlpha / 200;
+    return {
+      borderRadius: `${liquidGlassConfig.cornerRadius}px`,
+      backdropFilter: filter,
+      WebkitBackdropFilter: filter,
+      background: `rgba(255,255,255,${bgAlpha})`,
+      boxShadow: `0 0 ${liquidGlassConfig.softness}px rgba(255,255,255,${specHighAlpha}), inset 0 1px 0 rgba(255,255,255,${specLowAlpha})`,
+      opacity: liquidGlassConfig.opacity / 100,
+      border: `1px solid rgba(255,255,255,${borderAlpha})`,
+    };
+  }, [liquidGlassConfig, isDark]);
+
   return (
-    <Card className="bg-gradient-to-r from-brand-purple/10 to-brand-purple/5 border-brand-purple/20">
+    <Card 
+      className={cn(
+        !liquidGlassConfig.enabled && "bg-gradient-to-r from-brand-purple/10 to-brand-purple/5 border-brand-purple/20",
+        liquidGlassConfig.enabled && "bg-transparent border-transparent"
+      )}
+      style={liquidGlassConfig.enabled ? glassStyle : undefined}
+    >
       <CardHeader className="pb-3 lg:pb-4">
         <div className="flex items-center justify-between">
           <div>
@@ -42,7 +73,7 @@ const PageHeaderCard: React.FC<PageHeaderCardProps> = ({
                 </span>
               )}
             </CardTitle>
-            <p className="text-gray-600 dark:text-gray-400 mt-1 text-sm lg:text-base">
+            <p className="text-muted-foreground mt-1 text-sm lg:text-base">
               {subtitle}
             </p>
             {currentPlan && (
@@ -52,11 +83,11 @@ const PageHeaderCard: React.FC<PageHeaderCardProps> = ({
             )}
             {value && (
               <div className="mt-2">
-                <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                <p className="text-lg font-semibold">
                   {value}
                 </p>
                 {valueDetails && (
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-sm text-muted-foreground">
                     {valueDetails}
                   </p>
                 )}

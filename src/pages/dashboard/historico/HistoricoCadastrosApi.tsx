@@ -2,12 +2,12 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, FileText, RefreshCw, ShoppingCart, Package, FileEdit } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { FileText, RefreshCw, ShoppingCart, Package, FileEdit } from 'lucide-react';
 import { centralCashApiService, type CentralCashTransaction } from '@/services/centralCashApiService';
 import { pdfRgService, type PdfRgPedido } from '@/services/pdfRgService';
 import { editarPdfService, type EditarPdfPedido } from '@/services/pdfPersonalizadoService';
 import { formatDate } from '@/utils/historicoUtils';
+import DashboardTitleCard from '@/components/dashboard/DashboardTitleCard';
 
 interface UnifiedOrder {
   id: string;
@@ -27,7 +27,6 @@ const statusLabels: Record<string, string> = {
 };
 
 const HistoricoCadastrosApi = () => {
-  const navigate = useNavigate();
   const [orders, setOrders] = useState<UnifiedOrder[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -42,7 +41,6 @@ const HistoricoCadastrosApi = () => {
 
       const unified: UnifiedOrder[] = [];
 
-      // Module purchases from central cash
       if (cashResult.status === 'fulfilled' && cashResult.value.success && cashResult.value.data) {
         const modulePurchases = cashResult.value.data.filter(
           (t: CentralCashTransaction) =>
@@ -66,7 +64,6 @@ const HistoricoCadastrosApi = () => {
         });
       }
 
-      // PDF RG orders
       if (rgResult.status === 'fulfilled' && rgResult.value.success && rgResult.value.data) {
         rgResult.value.data.data.forEach((p: PdfRgPedido) => {
           unified.push({
@@ -81,22 +78,20 @@ const HistoricoCadastrosApi = () => {
         });
       }
 
-      // PDF Personalizado orders
       if (persResult.status === 'fulfilled' && persResult.value.success && persResult.value.data) {
         persResult.value.data.data.forEach((p: EditarPdfPedido) => {
           unified.push({
             id: `pers_${p.id}`,
             type: 'pdf_personalizado',
-            description: `PDF Personalizado - ${p.nome_solicitante}`,
+            description: `PDF Personalizado - ${(p as any).nome || (p as any).cpf || p.id}`,
             amount: p.preco_pago,
             status: p.status,
             created_at: p.created_at,
-            meta: { descricao: p.descricao_alteracoes },
+            meta: { cpf: (p as any).cpf, nome: (p as any).nome },
           });
         });
       }
 
-      // Sort by date desc
       unified.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
       setOrders(unified);
     } catch (error) {
@@ -134,24 +129,16 @@ const HistoricoCadastrosApi = () => {
 
   return (
     <div className="space-y-3 sm:space-y-6 relative z-10 px-1 sm:px-0">
-      <Card>
-        <CardHeader className="p-3 sm:p-6">
-          <div className="flex items-center justify-between gap-2">
-            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-              <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-              <span className="truncate">Histórico · Cadastros na API</span>
-            </CardTitle>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={loadData} disabled={isLoading} className="h-8 sm:h-9">
-                <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-              </Button>
-              <Button variant="outline" size="icon" onClick={() => navigate('/dashboard/historico')} className="rounded-full h-9 w-9" aria-label="Voltar" title="Voltar">
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-      </Card>
+      <DashboardTitleCard
+        title="Histórico · Cadastros na API"
+        icon={<FileText className="h-4 w-4 sm:h-5 sm:w-5" />}
+        backTo="/dashboard/historico"
+        right={
+          <Button variant="outline" size="sm" onClick={loadData} disabled={isLoading} className="h-8 sm:h-9">
+            <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+          </Button>
+        }
+      />
 
       <Card>
         <CardHeader className="p-3 sm:p-6 pb-2">
@@ -168,51 +155,42 @@ const HistoricoCadastrosApi = () => {
         <CardContent className="p-3 sm:p-6 pt-0">
           {isLoading ? (
             <div className="text-center py-8">
-              <RefreshCw className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
-              <p className="text-muted-foreground text-sm">Carregando registros...</p>
+              <div className="animate-spin mx-auto w-6 h-6 border-2 border-primary border-t-transparent rounded-full mb-2" />
+              <p className="text-sm text-muted-foreground">Carregando pedidos...</p>
             </div>
-          ) : orders.length > 0 ? (
+          ) : orders.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <Package className="h-10 w-10 mx-auto mb-2 opacity-40" />
+              <p className="text-sm">Nenhum pedido encontrado</p>
+            </div>
+          ) : (
             <div className="space-y-2">
               {orders.map((order) => (
                 <div
                   key={order.id}
-                  className={`border rounded-lg p-3 sm:p-4 bg-card border-l-4 ${getBorderColor(order.type)} space-y-2`}
+                  className={`flex items-center justify-between gap-3 p-3 rounded-lg border border-l-4 ${getBorderColor(order.type)} bg-muted/30`}
                 >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0 space-y-1">
-                      <p className="text-sm font-medium">{order.description}</p>
-                      <div className="flex flex-wrap items-center gap-1.5">
-                        <span className="text-xs text-muted-foreground">
-                          {formatDate(order.created_at)}
-                        </span>
-                        {getTypeBadge(order.type)}
-                        {order.status !== 'completed' && (
-                          <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4">
-                            {statusLabels[order.status] || order.status}
-                          </Badge>
-                        )}
-                        {order.meta?.payment_method && (
-                          <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 uppercase">
-                            {order.meta.payment_method}
-                          </Badge>
-                        )}
-                      </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      {getTypeBadge(order.type)}
+                      <span className="text-xs text-muted-foreground">{formatDate(order.created_at)}</span>
                     </div>
+                    <p className="text-sm font-medium truncate">{order.description}</p>
+                    {order.meta?.module_name && (
+                      <p className="text-xs text-muted-foreground">Módulo: {order.meta.module_name}</p>
+                    )}
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-sm font-semibold">{formatCurrency(order.amount)}</p>
                     <Badge
                       variant="secondary"
-                      className="text-xs font-semibold px-2 bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300 flex-shrink-0"
+                      className="text-[10px] px-1.5 py-0 h-4"
                     >
-                      {formatCurrency(order.amount)}
+                      {statusLabels[order.status] || order.status}
                     </Badge>
                   </div>
                 </div>
               ))}
-            </div>
-          ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              <ShoppingCart className="h-10 w-10 mx-auto mb-3 opacity-50" />
-              <p className="text-sm">Nenhum pedido registrado ainda</p>
-              <p className="text-xs mt-1">Pedidos de PDF RG, PDF Personalizado e compras de módulos aparecerão aqui</p>
             </div>
           )}
         </CardContent>

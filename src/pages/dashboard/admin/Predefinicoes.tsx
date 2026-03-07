@@ -6,9 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import { Settings, Save, Loader2, Globe, MessageCircle, Shield, DollarSign, Users, RefreshCw, ArrowLeft, Instagram, Send, Music, Phone } from 'lucide-react';
+import { Settings, Save, Loader2, Globe, MessageCircle, Shield, DollarSign, Users, RefreshCw, Instagram, Send, Music, Phone } from 'lucide-react';
 import { systemConfigAdminService, SystemConfigItem } from '@/services/systemConfigAdminService';
-import { useNavigate } from 'react-router-dom';
+import DashboardTitleCard from '@/components/dashboard/DashboardTitleCard';
 
 const CATEGORY_LABELS: Record<string, { label: string; icon: React.ReactNode }> = {
   general: { label: 'Geral', icon: <Globe className="h-4 w-4" /> },
@@ -35,7 +35,6 @@ const isMultilineField = (key: string): boolean => {
 };
 
 const Predefinicoes = () => {
-  const navigate = useNavigate();
   const [configs, setConfigs] = useState<SystemConfigItem[]>([]);
   const [editedValues, setEditedValues] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
@@ -241,49 +240,23 @@ const Predefinicoes = () => {
 
   return (
     <div className="space-y-4 relative z-10">
-      {/* Header */}
-      <Card>
-        <CardHeader className="p-3 sm:p-6">
-          <div className="flex items-center justify-between gap-2">
-            <div className="min-w-0 flex-1">
-              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                <Settings className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" />
-                <span className="truncate">Predefinições do Sistema</span>
-                {error && (
-                  <span className="text-[10px] sm:text-xs bg-red-100 text-red-700 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded dark:bg-red-900 dark:text-red-300 flex-shrink-0">
-                    Erro
-                  </span>
-                )}
-              </CardTitle>
-              <p className="text-xs sm:text-sm text-muted-foreground mt-1 hidden sm:block">
-                {error ? 'Erro ao carregar dados' : 'Gerencie as configurações globais da plataforma'}
-              </p>
-            </div>
-            <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={fetchConfigs}
-                disabled={loading}
-                className="h-7 w-7 sm:h-8 sm:w-8 p-0"
-                title="Recarregar"
-              >
-                <RefreshCw className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${loading ? 'animate-spin' : ''}`} />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => navigate('/dashboard')}
-                className="rounded-full h-9 w-9"
-                aria-label="Voltar"
-                title="Voltar"
-              >
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-      </Card>
+      <DashboardTitleCard
+        title="Predefinições do Sistema"
+        subtitle={error ? 'Erro ao carregar dados' : 'Gerencie as configurações globais da plataforma'}
+        icon={<Settings className="h-4 w-4 sm:h-5 sm:w-5" />}
+        right={
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={fetchConfigs}
+            disabled={loading}
+            className="h-7 w-7 sm:h-8 sm:w-8 p-0"
+            title="Recarregar"
+          >
+            <RefreshCw className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${loading ? 'animate-spin' : ''}`} />
+          </Button>
+        }
+      />
 
       {/* Loading */}
       {loading && (
