@@ -26,7 +26,7 @@ export const defaultLiquidGlassConfig: LiquidGlassConfig = {
   tintSaturation: 60,
   tintHue: 0,
   contrast: 100,
-  brightness: 92,
+  brightness: 115,
   invert: 0,
   edgeSpecularity: 100,
   cornerRadius: 10,
