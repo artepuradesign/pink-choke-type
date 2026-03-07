@@ -156,3 +156,39 @@
 .homepage-module-card .h-\[190px\] {
   height: 155px !important;
 }
+
+/* ===== Mobile App-like Behavior ===== */
+/* Prevent overscroll bounce */
+html, body {
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Hide scrollbars globally but keep scroll functionality */
+* {
+  -ms-overflow-style: none; /* IE/Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+*::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+/* Safe area insets for notched devices */
+body {
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+/* Prevent text selection on interactive elements (app-like feel) */
+@media (max-width: 768px) {
+  button, a, nav, .sidebar-item, .mobile-menu-item {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Prevent pull-to-refresh on mobile */
+  body {
+    overscroll-behavior-y: contain;
+  }
+}
