@@ -159,7 +159,12 @@ const SimpleTitleBar = ({
   const iconElement = renderLargeIcon();
 
   return (
-    <Card>
+    <Card
+      className={cn(
+        liquidGlassConfig.enabled && "bg-transparent border-transparent"
+      )}
+      style={liquidGlassConfig.enabled ? glassStyle : undefined}
+    >
       <CardHeader className="px-4 md:px-6">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3 flex-1 min-w-0">
