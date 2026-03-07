@@ -35,7 +35,7 @@ const isMultilineField = (key: string): boolean => {
 };
 
 const Predefinicoes = () => {
-  const navigate = useNavigate();
+  const [configs, setConfigs] = useState<SystemConfigItem[]>([]);
   const [configs, setConfigs] = useState<SystemConfigItem[]>([]);
   const [editedValues, setEditedValues] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
