@@ -1,4 +1,3 @@
-
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
@@ -71,6 +70,8 @@ export default defineConfig(({ mode }) => ({
       workbox: {
         navigateFallbackDenylist: [/^\/~oauth/],
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        // Aumenta o limite para permitir precache de bundles maiores
+        maximumFileSizeToCacheInBytes: 6 * 1024 * 1024, // 6 MiB
       },
     }),
   ].filter(Boolean),
